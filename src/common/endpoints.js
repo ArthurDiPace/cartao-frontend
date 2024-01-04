@@ -2,4 +2,4 @@ const endpoints = {
     CARTAO: 'api/cartoes',   
   }
   
-  export default endpoints
+export default endpoints

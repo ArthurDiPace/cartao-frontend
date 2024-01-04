@@ -13,7 +13,7 @@
           >
             <v-text-field
               v-model="cartao.numero"
-              v-mask="['################']"
+              v-mask="['####################']"
               label="Numero do Cartão"
               :error-messages="errors.numero"
             />
@@ -23,10 +23,10 @@
             sm="12"
           >
             <v-text-field
-              v-model="cartao.nome_titular"
-              label="Nome do titular"
-              :error-messages="errors.nome_titular"
-              @input="uppercaseFields('nome_titular')"
+              v-model="cartao.nome"
+              label="Nome"
+              :error-messages="errors.nome"
+              @input="uppercaseFields('nome')"
             />
           </v-col>
           <v-col
@@ -34,10 +34,10 @@
             sm="12"
           >
             <v-text-field
-              v-model="cartao.data_validade"
+              v-model="cartao.data"
               v-mask="['##/##/####']"
-              label="Data de Validade"
-              :error-messages="errors.data_validade"
+              label="Data"
+              :error-messages="errors.data"
             />
           </v-col>
           <v-col
@@ -45,9 +45,9 @@
             sm="12"
           >
             <v-text-field
-              v-model="cartao.codigo_seguranca"
-              label="Codigo Seguranca"
-              :error-messages="errors.codigo_seguranca"
+              v-model="cartao.lote"
+              label="Lote"
+              :error-messages="errors.lote"
             />
           </v-col>
           <v-col
@@ -55,10 +55,39 @@
             sm="12"
           >
             <v-text-field
-              v-model="cartao.tipo"
-              label="Tipo"
-              :error-messages="errors.tipo"
-              @input="uppercaseFields('nome_titular')"
+              v-model="cartao.numero_lote"
+              label="Numero Lote"
+              :error-messages="errors.numero_lote"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+          >
+            <v-text-field
+              v-model="cartao.qtd_registro"
+              label="Quantidade de Registro"
+              :error-messages="errors.qtd_registro"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+          >
+            <v-text-field
+              v-model="cartao.numero_lote"
+              label="Numero do lote"
+              :error-messages="errors.numero_lote"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+          >
+            <v-text-field
+              v-model="cartao.identificador_linha"
+              label="Identificador Linha"
+              :error-messages="errors.identificador_linha"
             />
           </v-col>
         </v-row>

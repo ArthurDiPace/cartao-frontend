@@ -19,15 +19,15 @@
         <div class="d-flex align-center">
           <div style="max-width: 200px">
             <v-text-field
-              v-model="filtro.nome_titular"
-              label="Nome do Titular"
+              v-model="filtro.nome"
+              label="Nome"
               class="mr-3"
             />
           </div>
           <div style="max-width: 500px">
             <v-text-field
               v-model="filtro.numero"
-              v-mask="['################']"
+              v-mask="['####################']"
               label="Numero Cartão"
               class="mr-3"
             />
@@ -91,107 +91,114 @@
   </v-container>
 </template>
   
-  <script>
-  import ConfirmDialog from '@/components/ConfirmDialog.vue'
-  import SPagebar from '@/layout/SPagebar.vue'
-  export default {
-    name: 'CartoesList',
-    components: { SPagebar, ConfirmDialog },
-    data: () => ({
-      breadcrumbs: [
-        {
-          'text': 'Cartões',
-          'to': '/cartoes',
-          'exact': true
-        }
-      ],
-      headers: [
-        {text: 'Numero', value: 'numero'},
-        {text: 'Tipo', value: 'tipo'},
-        {text: 'Nome do Titular', value: 'nome_titular'},
-        {text: 'Data de Validade', value: 'data_validade'},
-        {text: 'Ações', value: 'action'},
-      ],
-      totalItems: 0,
-      items: [],
-      options: {},
-      filtro: {
-        nome_titular: '',
-        numero: '',
-      },
-      filtroAnterior: {
-        nome_titular: null,
-        numero: null,
-      },
-    }),
-    watch: {
-      'filtro.nome_titular'() {
-          this.getCartoes();
-        },
-        'filtro.numero'() {
-          this.getCartoes();
-        },
-        options: {
-            handler() {
-                this.getCartoes();
-            },
-            deep: true
-        },
+<script>
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import SPagebar from '@/layout/SPagebar.vue'
+export default {
+  name: 'CartoesList',
+  components: { SPagebar, ConfirmDialog },
+  data: () => ({
+    breadcrumbs: [
+      {
+        'text': 'Cartões',
+        'to': '/cartoes',
+        'exact': true
+      }
+    ],
+    headers: [
+      {text: 'Numero', value: 'numero'},
+      {text: 'Nome', value: 'nome'},
+      {text: 'Lote', value: 'lote'},
+      {text: 'Data', value: 'data'},
+      {text: 'Ações', value: 'action'},
+    ],
+    totalItems: 0,
+    items: [],
+    options: {},
+    filtro: {
+      nome: '',
+      numero: '',
     },
-    methods: {
-      async getCartoes() {
-        const { sortBy, sortDesc, page, itemsPerPage } = this.options
-        
-        let resetPage = false;
-        let ordering = sortBy[0];
-        if (sortDesc[0]) {
-          ordering = `-${ordering}`;
-        }
+    filtroAnterior: {
+      nome: null,
+      numero: null,
+    },
+  }),
+  watch: {
+    'filtro.nome'() {
+        this.getCartoes();
+      },
+      'filtro.numero'() {
+        this.getCartoes();
+      },
+      options: {
+          handler() {
+              this.getCartoes();
+          },
+          deep: true
+      },
+  },
+  methods: {
+    async getCartoes() {
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options
+      
+      let resetPage = false;
+      let ordering = sortBy[0];
+      if (sortDesc[0]) {
+        ordering = `-${ordering}`;
+      }
 
-        if (
-          this.filtro.nome_titular !== this.filtroAnterior.nome_titular ||
-          this.filtro.numero !== this.filtroAnterior.numero
-        ) {
-          resetPage = true;
-          this.options.page = 1;
-          this.filtroAnterior = { ...this.filtro };
+      if (
+        this.filtro.nome !== this.filtroAnterior.nome ||
+        this.filtro.numero !== this.filtroAnterior.numero
+      ) {
+        resetPage = true;
+        this.options.page = 1;
+        this.filtroAnterior = { ...this.filtro };
+      }
+      
+      ordering = `${sortDesc && sortDesc[0] ? '-' : ''}${sortBy}`;
+      
+      const query = {
+        page: resetPage ? 1 : page,
+        page_size: itemsPerPage,
+        ordering: ordering,
+        nome: this.filtro.nome,
+        numero: this.filtro.numero,
+      }
+      const response = await this.$api.list({
+        resource: this.$endpoints.CARTAO,
+        query: query
+      })
+      this.items = response.data
+      this.totalItems = response.data.count
+    },
+    cadastrar() {
+      this.$router.push('/cartoes/cadastrar')
+    },
+    editar(id) {
+      this.$router.push(`/cartoes/${id}`)
+    },
+    async excluir(id) {
+        const res = await this.$refs.confirm.open(
+          'Confirmar exclusão',
+          'Tem certeza que deseja excluir este registro?'
+        )
+        if (res) {
+          const response = this.$api.destroy({
+            resource: this.$endpoints.CARTAO,
+            id: id
+          })
+          response.then(()=>this.getCartoes())
         }
-        
-        ordering = `${sortDesc && sortDesc[0] ? '-' : ''}${sortBy}`;
-        
-        const query = {
-          page: resetPage ? 1 : page,
-          page_size: itemsPerPage,
-          ordering: ordering,
-          nome_titular: this.filtro.nome_titular,
-          numero: this.filtro.numero,
-        }
-        const response = await this.$api.list({
-          resource: this.$endpoints.CARTAO,
-          query: query
-        })
-        this.items = response.data.results
-        this.totalItems = response.data.count
-      },
-      cadastrar() {
-        this.$router.push('/cartoes/cadastrar')
-      },
-      editar(id) {
-        this.$router.push(`/cartoes/${id}`)
-      },
-      async excluir(id) {
-          const res = await this.$refs.confirm.open(
-            'Confirmar exclusão',
-            'Tem certeza que deseja excluir este registro?'
-          )
-          if (res) {
-            const response = this.$api.destroy({
-              resource: this.$endpoints.CARTAO,
-              id: id
-            })
-            response.then(()=>this.getCartoes())
-          }
-      },
-    }
+    },
+    limparFiltros() {
+      this.filtro = {
+        nome: null,
+        numero: null,
+      }
+      this.getCartoes()
+    },
   }
-  </script>
+}
+</script>
